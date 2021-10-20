@@ -2,9 +2,11 @@
 @section('content')
     <div id="select_user">
         <label for="user">User</label>
-        <select name="user_id" id="user" class="form-control select2">
+        <select name="user_id" id="select_calendar_user" class="form-control select2">
             @foreach($users as $id => $name)
-            <option value="{{ $id }}">{{ $name }}</option>
+            <option value="{{ $id }}"
+                    @if (request('user_id') == $id) selected @endif>{{ $name }}
+            </option>
             @endforeach
         </select>
     </div>

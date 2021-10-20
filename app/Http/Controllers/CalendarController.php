@@ -6,29 +6,24 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class CalendarController extends Controller
 {
-    public function index(int $user_id = null)
+    public function index(Request $request)
     {
         $data = [];
+        $user_id  = $request->has('user_id') ? (int)$request->user_id : Auth::id();
+
         $users = User::all()->pluck('name', 'id')->prepend('Choose user', '');
 
-        $events = Event::where('user_id', $user_id ?? auth()->user()->id)->get();
-
-        $results = $events->map(function($item) {
-            $data['title'] = strip_tags($item['title']);
-            $data['start'] = $item['start_date'];
-            $data['end'] =  Carbon::parse($item['start_date'])
-                            ->addMinutes($item['duration'])
-                            ->toDateTimeString();
-
-            return $data;
-        });
+        $user = User::findOrFail($user_id);
+        $events = $user->getCalendarEvents();
 
         return view('admin.calendar.dashboard', [
-            'events' => $results,
-            'users' => $users
+            'events' => $events,
+            'users' => $users,
+            'user_id' => $user_id
         ]);
     }
 }

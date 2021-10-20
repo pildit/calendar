@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -41,4 +42,27 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function getCalendarEvents()
+    {
+        $data = [];
+        $events = $this->events;
+
+        $results = $events->map(function($item) {
+            $data['title'] = strip_tags($item['title']);
+            $data['start'] = $item['start_date'];
+            $data['end'] =  Carbon::parse($item['start_date'])
+                ->addMinutes($item['duration'])
+                ->toDateTimeString();
+
+            return $data;
+        });
+
+        return $results;
+    }
 }

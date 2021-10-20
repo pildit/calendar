@@ -9,4 +9,12 @@ $(document).ready(function () {
 
     $('.select2').select2()
 
+    $('#select_calendar_user').on('change', function(e) {
+        var base_url = window.location.origin + window.location.pathname;
+
+        if ($(this).val())
+            window.location = base_url + '?user_id=' + $(this).val();
+        else
+            window.location = base_url;
+    })
 })
